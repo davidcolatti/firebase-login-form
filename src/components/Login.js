@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import fire from "../config/Fire";
+import validation from "../schema/validation";
 
 const Login = () => {
-  const [email, setEmail] = useState(null);
-  const [password, setPassword] = useState(null);
+  const [field, setField] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
   const [fireErrors, setFireErrors] = useState(null);
   const [formTitle, setFormTitle] = useState("Login");
   const [loginBtn, setLoginBtn] = useState(true);
@@ -13,21 +17,28 @@ const Login = () => {
 
     fire
       .auth()
-      .signInWithEmailAndPassword(email, password)
+      .signInWithEmailAndPassword(field.email, field.password)
       .catch((err) => {
         setFireErrors(err.message);
       });
   }
 
-  function register(e) {
+  async function register(e) {
     e.preventDefault();
 
-    fire
-      .auth()
-      .createUserWithEmailAndPassword(email, password)
-      .catch((err) => {
-        setFireErrors(err.message);
-      });
+    let invalid = await validation(field);
+
+    if (invalid) {
+      let formatInvalid = invalid.slice(0, 1).toUpperCase() + invalid.slice(1);
+      setFireErrors(formatInvalid);
+    } else {
+      fire
+        .auth()
+        .createUserWithEmailAndPassword(field.email, field.password)
+        .catch((err) => {
+          setFireErrors(err.message);
+        });
+    }
   }
 
   function getAction(action) {
@@ -73,17 +84,35 @@ const Login = () => {
       <div className="body">
         {errorNotification}
         <form>
+          {formTitle === "Register New User" && (
+            <input
+              type="text"
+              value={field.name}
+              placeholder="Name"
+              onChange={(e) =>
+                setField({ ...field, [e.target.name]: e.target.value })
+              }
+              name="name"
+            />
+          )}
+
           <input
             type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            value={field.email}
+            onChange={(e) =>
+              setField({ ...field, [e.target.name]: e.target.value })
+            }
             name="email"
           />
 
           <input
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            value={field.password}
+            onChange={(e) =>
+              setField({ ...field, [e.target.name]: e.target.value })
+            }
             name="password"
           />
 

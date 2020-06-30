@@ -1,14 +1,15 @@
 import React from "react";
 import fire from "../config/Fire";
 
-const Home = () => {
+const Home = ({ user }) => {
   function logout() {
     fire.auth().signOut();
   }
 
   return (
     <div>
-      <h1>You are home!</h1>
+      <h1>This is the home page!</h1>
+      <p>You are logged in as {user.email}</p>
       <button onClick={logout}>Logout</button>
     </div>
   );

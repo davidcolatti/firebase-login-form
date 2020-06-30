@@ -22,7 +22,7 @@ const App = () => {
     });
   }
 
-  return <div>{user ? <Home /> : <Login />}</div>;
+  return <div>{user ? <Home user={user} /> : <Login />}</div>;
 };
 
 export default App;
