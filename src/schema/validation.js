@@ -1,10 +1,17 @@
 import * as yup from "yup";
 
 async function validation(user) {
-  let validateMessage;
+  let validateInfo = {};
 
   const schema = yup.object().shape({
     name: yup.string().required(),
+    age: yup
+      .number()
+      .required()
+      .positive()
+      .integer()
+      .default(0)
+      .typeError("age must be a number"),
     email: yup.string().email().required(),
     password: yup.string().required(),
     createdOn: yup.date().default(function () {
@@ -13,12 +20,12 @@ async function validation(user) {
   });
 
   try {
-    await schema.validate(user);
+    validateInfo.valid = await schema.validate(user);
   } catch (err) {
-    validateMessage = err.message;
+    validateInfo.message = err.message;
   }
 
-  return validateMessage;
+  return validateInfo;
 }
 
 export default validation;

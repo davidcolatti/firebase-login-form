@@ -5,6 +5,7 @@ import validation from "../schema/validation";
 const Login = () => {
   const [field, setField] = useState({
     name: "",
+    age: "",
     email: "",
     password: "",
   });
@@ -26,18 +27,21 @@ const Login = () => {
   async function register(e) {
     e.preventDefault();
 
-    let invalid = await validation(field);
+    let validateInfo = await validation(field);
+    console.log(validateInfo);
 
-    if (invalid) {
-      let formatInvalid = invalid.slice(0, 1).toUpperCase() + invalid.slice(1);
-      setFireErrors(formatInvalid);
-    } else {
+    if (validateInfo.valid) {
       fire
         .auth()
         .createUserWithEmailAndPassword(field.email, field.password)
         .catch((err) => {
           setFireErrors(err.message);
         });
+    } else {
+      let formatMessage =
+        validateInfo.message.slice(0, 1).toUpperCase() +
+        validateInfo.message.slice(1);
+      setFireErrors(formatMessage);
     }
   }
 
@@ -45,12 +49,12 @@ const Login = () => {
     if (action === "reg") {
       setFormTitle("Register New User");
       setLoginBtn(false);
-      setFireErrors("");
     } else {
       setFormTitle("Login");
       setLoginBtn(true);
-      setFireErrors("");
     }
+
+    setFireErrors("");
   }
 
   let errorNotification = fireErrors && (
@@ -85,15 +89,32 @@ const Login = () => {
         {errorNotification}
         <form>
           {formTitle === "Register New User" && (
-            <input
-              type="text"
-              value={field.name}
-              placeholder="Name"
-              onChange={(e) =>
-                setField({ ...field, [e.target.name]: e.target.value })
-              }
-              name="name"
-            />
+            <>
+              <input
+                type="text"
+                value={field.name}
+                placeholder="Name"
+                onChange={(e) =>
+                  setField({ ...field, [e.target.name]: e.target.value })
+                }
+                name="name"
+              />
+
+              <input
+                type="number"
+                value={field.age}
+                placeholder="Age"
+                onChange={(e) =>
+                  setField({
+                    ...field,
+                    [e.target.name]: e.target.value
+                      ? Number(e.target.value)
+                      : undefined,
+                  })
+                }
+                name="age"
+              />
+            </>
           )}
 
           <input
